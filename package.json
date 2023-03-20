@@ -1,5 +1,6 @@
 {
   "name": "simple-eth-app",
+  "homepage": "https://daneelzam.github.io/my-ethereum-app",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -20,6 +21,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "deploy": "gh-pages -d build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -42,6 +44,7 @@
     ]
   },
   "devDependencies": {
-    "web3": "^1.8.2"
+    "web3": "^1.8.2",
+    "gh-pages": "^5.0.0"
   }
 }
