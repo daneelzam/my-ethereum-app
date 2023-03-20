@@ -1,40 +1,72 @@
-import React, { useState } from 'react';
-import Web3 from 'web3';
+import React, { useEffect, useState } from 'react';
 import logo from './logo.png';
 import './App.css';
-
-const web3 = new Web3(new Web3.providers.HttpProvider(`https://goerli.infura.io/v3/${process.env.REACT_APP_INFURA_PROJECT_ID}`));
+import { getBalance, getTransactionList, sendTransaction } from './App.util';
+import { EthTx } from './App.model';
 
 function App() {
-  const [addressFrom, setAddressFrom] = useState('');
-  const [privateKey, setPrivateKey] = useState('');
-  const [balance, setBalance] = useState('');
-  const [addressTo, setAddressTo] = useState('');
-  const [amount, setAmount] = useState('');
-  const [txHash, setTxHash] = useState('');
-  const [txURL, setTxURl] = useState('');
-  const [error, setError] = useState('');
-  const [blockNumber, setBlockNumber] = useState('');
+  const [addressFrom, setAddressFrom] = useState<string| undefined>();
+  const [privateKey, setPrivateKey] = useState<string| undefined>();
+  const [addressTo, setAddressTo] = useState<string| undefined>();
+  const [amount, setAmount] = useState<string| undefined>();
 
-  const getBalance = (event: React.FormEvent<HTMLButtonElement>) => {
+  const [balance, setBalance] = useState<string| undefined>();
+  const [balanceIsLoading, setBalanceIsLoading] = useState(false);
+
+  const [txList, setTxList] = useState<EthTx[]>()
+  const [txListIsLoading, setTxListIsLoading] = useState(false);
+
+
+  const [txHash, setTxHash] = useState<string| undefined>();
+  const [txURL, setTxURl] = useState<string| undefined>();
+  const [blockNumber, setBlockNumber] = useState<string| undefined>();
+  const [txIsSending, setTxIsSending] = useState(false);
+
+  const [error, setError] = useState<string| undefined>();
+  
+  useEffect(function cleanError(){
+    if(error){
+      setTimeout(() => setError(undefined), 2000);
+    }
+  }, [error, setError]);
+
+  const getBalanceHandler = async (event: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
+    
     if (!addressFrom){
       setError('Please enter wallet address ')
-      return;
-    }
-    web3.eth.getBalance(addressFrom, function(error, result) {
-      if(!error) {
-        const balance = web3.utils.fromWei(result, 'ether');
-        setBalance(balance)
-      }
-      else {
-        setError(error.message);
-      }
-    });
+    } else {
+      setBalanceIsLoading(true)
 
+      try {
+        const result = await getBalance({addressFrom});
+        setBalance(result)
+      } catch (err: any) {
+        setError(err.message || 'Error')
+      }
+      
+      setBalanceIsLoading(false);
+    }
   }
 
-  const sendTransaction = async (event: React.FormEvent<HTMLButtonElement>) => {
+  const getTransactionListHandler = async () => {
+    if (!addressFrom){
+      setError('Please enter wallet address ')
+    } else {
+      setTxListIsLoading(true)
+
+      try {
+        const result = await getTransactionList({addressFrom});
+        setTxList(result)
+      } catch (err: any) {
+        setError(err.message || 'Error')
+      }
+      
+      setTxListIsLoading(false);
+    }
+  }
+
+  const sendTransactionHandler = async (event: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
     if (!addressFrom || !addressTo || !privateKey || !amount){
@@ -46,27 +78,19 @@ function App() {
       setError('Insufficient funds');
       return;
     }
+    
+    setTxIsSending(true);
 
-    const account = web3.eth.accounts.privateKeyToAccount(privateKey);
-    web3.eth.accounts.wallet.add(account);
+    try {
+      const result = await sendTransaction({addressTo, amount, privateKey});
+      setTxHash(result.hash);
+      setTxURl(`https://goerli.etherscan.io/tx/${result.hash}`)
+      setBlockNumber(result.blockNumber)
+    } catch (err: any) {
+      setError(err.message || 'Error')
+    }
 
-    const transactionObject: {from: string, to: string, value: string, gas?: number} = {
-        from: account.address,
-        to: addressTo,
-        value: web3.utils.toWei(amount, 'ether'),
-      };
-
-    transactionObject.gas = await web3.eth.estimateGas(transactionObject);
-
-
-    const receipt = await web3.eth
-    .sendTransaction(transactionObject)
-    .once("transactionHash", (txhash) => {
-      setTxHash(txhash);
-      setTxURl(`https://goerli.etherscan.io/tx/${txhash}`)
-    });
-
-    setBlockNumber(receipt.blockNumber.toString())
+    setTxIsSending(false);
   }
 
   return (
@@ -78,32 +102,89 @@ function App() {
         </h1>
       </header>
       <article className="App-body">
+        <div className='line'/>
+        <h2>Your wallet info</h2>
         <form className="form">
-          <div>
+          <div className='form-item'>
             <label htmlFor="addressFrom">Address from</label>
             <input type="text" name="addressFrom" value={addressFrom} onChange={(event: React.FormEvent<HTMLInputElement>)=>setAddressFrom(event.currentTarget.value)}/>
           </div>
-          <div>
+          <div className='form-item'>
             <label htmlFor="privateKey">Private key</label>
             <input type="text" name="privateKey" value={privateKey} onChange={(event: React.FormEvent<HTMLInputElement>)=>setPrivateKey(event.currentTarget.value)}/>
           </div>
-          <button onClick={getBalance}>Get balance</button>
-          <div>Balance: {balance ? `${balance} Goerli Eth` : '-'}</div>
+            <button className='button' disabled={balanceIsLoading} onClick={getBalanceHandler}>{
+              balanceIsLoading
+              ? <div className='loading'>Loading</div>
+              : 'Get balance'}
+            </button>
+          <div className='result'>
+            <div>Balance:</div>
+            <div>{balance ? `${balance} Goerli Eth` : '-'}</div>
+          </div>
         </form>
+        <div className='line'/>
+        <h2>Receiver wallet info</h2>
         <form className="form">
-          <div>
+        <div className='form-item'>
             <label htmlFor="addressTo">Address to</label>
             <input type="text" name="addressTo" value={addressTo} onChange={(event: React.FormEvent<HTMLInputElement>)=>setAddressTo(event.currentTarget.value)}/>
           </div>
-          <div>
+          <div className='form-item'>
             <label htmlFor="amount">amount</label>
             <input type="text" name="amount" value={amount} onChange={(event: React.FormEvent<HTMLInputElement>)=>setAmount(event.currentTarget.value)}/>
           </div>
-          <button onClick={sendTransaction}>Send</button>
-          <div>Transaction hash: {txHash ? <a href={txURL}>{txHash}</a> : '-'}</div>
+          <button className='button' onClick={sendTransactionHandler}>
+            {txIsSending
+              ? <div className='loading'>Loading</div>
+              : 'Send'}
+          </button>
+          <div className='result'>
+            <div>Transaction hash:</div>
+            <div className='hash'>{txHash ? <a href={txURL} target='_blank' rel="noreferrer">{txHash}</a> : '-'}</div>
+          </div>
           {blockNumber && <div>SUCCESS, your transaction in the chain now, in block number {blockNumber}</div>}
+          {error && <div className='error'>{error}</div>}
         </form>
-        {error && <div className='error'>{error}</div>}
+        <div>
+          <div>
+            <div className='line'/>
+            <h2>Transactions:</h2>
+            <div className='button-wrapper'>
+              <button className='button' onClick={getTransactionListHandler}>
+              {txListIsLoading
+                ? <div className='loading'>Loading</div>
+                : 'Get transaction list'}
+              </button>
+            </div>
+            <div className='tx-list-wrapper'>
+              {(txList && txList.length) && txList.map(tx => (
+                <div className='tx-item-wrapper' key={tx.hash}>
+                  <div className='tx-item'>
+                    <div>Date:</div>
+                    <div>{tx.timeStamp}</div>
+                  </div>
+                  <div className='tx-item'>
+                    <div>Hash:</div>
+                    <div className='hash'>{<a href={`https://goerli.etherscan.io/tx/${tx.hash}`} target='_blank' rel="noreferrer">{tx.hash}</a>}</div>
+                  </div>
+                  <div className='tx-item'>
+                    <div>From:</div>
+                    <div>{tx.from}</div>
+                  </div>
+                  <div className='tx-item'>
+                    <div>To:</div>
+                    <div>{tx.to}</div>
+                  </div>
+                  <div className='tx-item'>
+                    <div>Amount:</div>
+                    <div>{tx.value}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </article>
     </div>
   );
