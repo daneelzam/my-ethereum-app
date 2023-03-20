@@ -1,15 +1,14 @@
 {
   "files": {
-    "main.css": "/my-ethereum-app/static/css/main.2d791058.css",
-    "main.js": "/my-ethereum-app/static/js/main.cb3790e8.js",
-    "static/js/787.79138615.chunk.js": "/my-ethereum-app/static/js/787.79138615.chunk.js",
+    "main.css": "/my-ethereum-app/static/css/main.135177d3.css",
+    "main.js": "/my-ethereum-app/static/js/main.c0b57ca8.js",
+    "static/media/github.logo.svg": "/my-ethereum-app/static/media/github.logo.06c3d09d8282dd6397077f8a9294cc0b.svg",
     "index.html": "/my-ethereum-app/index.html",
-    "main.2d791058.css.map": "/my-ethereum-app/static/css/main.2d791058.css.map",
-    "main.cb3790e8.js.map": "/my-ethereum-app/static/js/main.cb3790e8.js.map",
-    "787.79138615.chunk.js.map": "/my-ethereum-app/static/js/787.79138615.chunk.js.map"
+    "main.135177d3.css.map": "/my-ethereum-app/static/css/main.135177d3.css.map",
+    "main.c0b57ca8.js.map": "/my-ethereum-app/static/js/main.c0b57ca8.js.map"
   },
   "entrypoints": [
-    "static/css/main.2d791058.css",
-    "static/js/main.cb3790e8.js"
+    "static/css/main.135177d3.css",
+    "static/js/main.c0b57ca8.js"
   ]
 }
