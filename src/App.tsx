@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import logo from './logo.png';
+import githubLogo from './github.logo.svg';
 import './App.css';
 import { getBalance, getTransactionList, sendTransaction } from './App.util';
 import { EthTx } from './App.model';
@@ -186,6 +187,11 @@ function App() {
           </div>
         </div>
       </article>
+      <footer>
+        <a href='https://github.com/daneelzam/my-ethereum-app' target="_blank" rel="noreferrer">
+          <img src={githubLogo} alt="GitHub logo"/>
+        </a>
+      </footer>
     </div>
   );
 }
