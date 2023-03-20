@@ -1,3 +1,7 @@
+body {
+  margin: 0;
+}
+
 .App {
   text-align: start;
   display: flex;
@@ -6,10 +10,6 @@
   background-color: #282c34;
   min-height: 100vh;
   color: white;
-}
-
-h1 {
-  text-align: center;
 }
 
 .App-logo {
@@ -33,6 +33,10 @@ h1 {
   width: 40vw;
 }
 
+h1 {
+  text-align: center;
+}
+
 .form {
   position: relative;
   width: 100%;
@@ -47,6 +51,12 @@ h1 {
   margin-bottom: 10px;
 }
 
+.form input {
+  margin-left: 10px;
+  width: 70%;
+  text-align: end;
+}
+
 .result {
   display: flex;
   justify-content: space-between;
@@ -57,12 +67,6 @@ h1 {
   box-sizing: border-box;
   border: 1px solid white;
   border-radius: 3px;
-}
-
-.form input {
-  margin-left: 10px;
-  width: 70%;
-  text-align: end;
 }
 
 .button {
@@ -81,6 +85,18 @@ h1 {
   color: #4520AA;
 }
 
+.button-wrapper {
+  display: flex;
+  justify-content: end;
+}
+
+.line {
+  border-bottom: 1px solid white;
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 .hash {
   max-width: 70%;
   overflow: hidden;
@@ -88,12 +104,6 @@ h1 {
   white-space: nowrap;
   cursor: pointer;
   text-decoration: none;
-}
-
-.tx-item a,
-.hash a {
-  text-decoration: none;
-  color: white;
 }
 
 .error {
@@ -136,6 +146,12 @@ h1 {
   width: 100%;
 }
 
+.tx-item a,
+.hash a {
+  text-decoration: none;
+  color: white;
+}
+
 @keyframes dots {
   0%,
   20% {
@@ -156,16 +172,4 @@ h1 {
   100% {
     text-shadow: 0.25em 0 0 gray, 0.5em 0 0 gray;
   }
-}
-
-.button-wrapper {
-  display: flex;
-  justify-content: end;
-}
-
-.line {
-  border-bottom: 1px solid white;
-  width: 100%;
-  margin-top: 10px;
-  margin-bottom: 10px;
 }
