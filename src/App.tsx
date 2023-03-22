@@ -75,6 +75,11 @@ function App() {
       return;
     }
 
+    if (balance === undefined){
+      setError('Please get the balance');
+      return;
+    }
+
     if (!balance || +balance < +amount){
       setError('Insufficient funds');
       return;
@@ -83,7 +88,7 @@ function App() {
     setTxIsSending(true);
 
     try {
-      const result = await sendTransaction({addressTo, amount, privateKey});
+      const result = await sendTransaction({addressFrom, addressTo, amount, privateKey});
       setTxHash(result.hash);
       setTxURl(`https://goerli.etherscan.io/tx/${result.hash}`)
       setBlockNumber(result.blockNumber)
@@ -125,7 +130,7 @@ function App() {
           </div>
         </form>
         <div className='line'/>
-        <h2>Receiver wallet info</h2>
+        <h2>Transaction info</h2>
         <form className="form">
         <div className='form-item'>
             <label htmlFor="addressTo">Address to</label>

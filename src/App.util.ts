@@ -14,32 +14,35 @@ export const getBalance = async ({ addressFrom }: {addressFrom: string}): Promis
         }
     });  
     
-    return web3.utils.fromWei(balance, 'ether');;
+    return web3.utils.fromWei(balance, 'ether');
 }
 
-export const sendTransaction = async ({privateKey, addressTo, amount}: {privateKey: string, addressTo: string, amount: string }): Promise<{
+export const sendTransaction = async ({ addressFrom, privateKey, addressTo, amount}: {addressFrom: string, privateKey: string, addressTo: string, amount: string }): Promise<{
     hash: string;
     blockNumber: string;
 }> => {
-
-    const account = web3.eth.accounts.privateKeyToAccount(privateKey);
-    web3.eth.accounts.wallet.add(account);
-
     const transactionObject: {from: string, to: string, value: string, gas?: number} = {
-        from: account.address,
+        from: addressFrom,
         to: addressTo,
         value: web3.utils.toWei(amount, 'ether'),
       };
 
     transactionObject.gas = await web3.eth.estimateGas(transactionObject);
     
+    const { rawTransaction: signedTransaction } = await web3.eth.accounts.signTransaction(transactionObject, privateKey);
+
+     if (!signedTransaction) {
+        throw Error('Some problem')
+     }
+
     let hash = '';
 
     const receipt = await web3.eth
-    .sendTransaction(transactionObject)
-    .once("transactionHash", (txhash) => {
+    .sendSignedTransaction(signedTransaction)
+    .on("transactionHash", (txhash) => {
         hash = txhash;
     });
+    
     return {
         hash, 
         blockNumber: receipt.blockNumber.toString()
