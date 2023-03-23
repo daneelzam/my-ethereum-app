@@ -159,6 +159,11 @@ footer a,
   color: white;
 }
 
+.ticker {
+  position: absolute;
+  right: -80px;
+}
+
 footer {
   margin: 10px
 }

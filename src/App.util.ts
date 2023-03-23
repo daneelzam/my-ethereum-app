@@ -15,17 +15,38 @@ export const getBalance = async ({ addressFrom }: {addressFrom: string}): Promis
     });  
     
     return web3.utils.fromWei(balance, 'ether');
-}
+};
 
-export const sendTransaction = async ({ addressFrom, privateKey, addressTo, amount}: {addressFrom: string, privateKey: string, addressTo: string, amount: string }): Promise<{
+export const getFee = async ({ amount, addressTo }: { amount: string, addressTo: string }): Promise<string> => {
+    try {
+        const gasPrice = await web3.eth.getGasPrice();
+        const gasPriceBN = web3.utils.toBN(gasPrice);
+        
+        const transaction = {
+            to: addressTo,
+            value: web3.utils.toWei(amount, "ether"),
+        };
+  
+        const gasEstimate = await web3.eth.estimateGas(transaction);
+        const gasEstimateBN = web3.utils.toBN(gasEstimate);
+
+        const gasInWeiBN = gasEstimateBN.mul(gasPriceBN);
+        const gasInEth = web3.utils.fromWei(gasInWeiBN, "ether");
+  
+        return gasInEth;
+    } catch (error) {
+      throw new Error("Commission calculation error");
+    }
+};
+
+export const sendTransaction = async ({ privateKey, addressTo, amount }: { privateKey: string, addressTo: string, amount: string }): Promise<{
     hash: string;
     blockNumber: string;
 }> => {
-    const transactionObject: {from: string, to: string, value: string, gas?: number} = {
-        from: addressFrom,
+    const transactionObject: { to: string, value: string, gas?: number } = {
         to: addressTo,
         value: web3.utils.toWei(amount, 'ether'),
-      };
+    };
 
     transactionObject.gas = await web3.eth.estimateGas(transactionObject);
     
@@ -47,7 +68,7 @@ export const sendTransaction = async ({ addressFrom, privateKey, addressTo, amou
         hash, 
         blockNumber: receipt.blockNumber.toString()
     }
-}
+};
 
 export const getTransactionList = async ({addressFrom}:{addressFrom: string}): Promise<EthTx[]> => {
     const responce = await fetch(`https://api-goerli.etherscan.io/api?module=account&action=txlist&address=${addressFrom}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${ETHERSCAN_API_KEY}`)
@@ -59,4 +80,4 @@ export const getTransactionList = async ({addressFrom}:{addressFrom: string}): P
             timeStamp: new Date(Math.ceil(Number(tx.timeStamp) * 1000)).toLocaleDateString() + ' ' + new Date(Math.ceil(Number(tx.timeStamp) * 1000)).toLocaleTimeString()
         }
     ));
-}
+};

@@ -2,14 +2,15 @@ import React, { useEffect, useState } from 'react';
 import logo from './logo.png';
 import githubLogo from './github.logo.svg';
 import './App.css';
-import { getBalance, getTransactionList, sendTransaction } from './App.util';
+import { getBalance, getTransactionList, sendTransaction, getFee } from './App.util';
 import { EthTx } from './App.model';
 
 function App() {
-  const [addressFrom, setAddressFrom] = useState<string| undefined>();
-  const [privateKey, setPrivateKey] = useState<string| undefined>();
-  const [addressTo, setAddressTo] = useState<string| undefined>();
-  const [amount, setAmount] = useState<string| undefined>();
+  const [addressFrom, setAddressFrom] = useState<string | undefined>();
+  const [privateKey, setPrivateKey] = useState<string | undefined>();
+  const [addressTo, setAddressTo] = useState<string | undefined>();
+  const [amount, setAmount] = useState<string | undefined>();
+  const [fee, setFee] = useState<string | undefined>();
 
   const [balance, setBalance] = useState<string| undefined>();
   const [balanceIsLoading, setBalanceIsLoading] = useState(false);
@@ -30,6 +31,20 @@ function App() {
       setTimeout(() => setError(undefined), 2000);
     }
   }, [error, setError]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(async () => {
+      if (amount && addressTo) {
+        setFee('Loading')
+        const estimatedFee = await getFee({ amount, addressTo });
+        setFee(estimatedFee);
+      } else {
+        setFee('');
+      }
+    }, 2000);
+
+    return () => clearTimeout(timeoutId);
+  }, [amount, addressTo]);
 
   const getBalanceHandler = async (event: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -88,7 +103,7 @@ function App() {
     setTxIsSending(true);
 
     try {
-      const result = await sendTransaction({addressFrom, addressTo, amount, privateKey});
+      const result = await sendTransaction({ addressTo, amount, privateKey });
       setTxHash(result.hash);
       setTxURl(`https://goerli.etherscan.io/tx/${result.hash}`)
       setBlockNumber(result.blockNumber)
@@ -137,8 +152,14 @@ function App() {
             <input type="text" name="addressTo" value={addressTo} onChange={(event: React.FormEvent<HTMLInputElement>)=>setAddressTo(event.currentTarget.value)}/>
           </div>
           <div className='form-item'>
-            <label htmlFor="amount">amount</label>
+            <label htmlFor="amount">Amount</label>
             <input type="text" name="amount" value={amount} onChange={(event: React.FormEvent<HTMLInputElement>)=>setAmount(event.currentTarget.value)}/>
+            <span className='ticker'>Goerli Eth</span>
+          </div>
+          <div className='form-item'>
+            <label htmlFor="fee">Fee</label>
+            <input type="text" name="fee" value={fee || '-'} disabled/>
+            <span className='ticker'>Goerli Eth</span>
           </div>
           <button className='button' onClick={sendTransactionHandler}>
             {txIsSending
@@ -184,7 +205,7 @@ function App() {
                   </div>
                   <div className='tx-item'>
                     <div>Amount:</div>
-                    <div>{tx.value}</div>
+                    <div>{tx.value} Goerli Eth</div>
                   </div>
                 </div>
               ))}
