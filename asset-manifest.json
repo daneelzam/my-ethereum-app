@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/my-ethereum-app/static/css/main.135177d3.css",
-    "main.js": "/my-ethereum-app/static/js/main.599aa499.js",
+    "main.css": "/my-ethereum-app/static/css/main.f11cd8e2.css",
+    "main.js": "/my-ethereum-app/static/js/main.be1e74e1.js",
     "static/media/github.logo.svg": "/my-ethereum-app/static/media/github.logo.06c3d09d8282dd6397077f8a9294cc0b.svg",
     "index.html": "/my-ethereum-app/index.html",
-    "main.135177d3.css.map": "/my-ethereum-app/static/css/main.135177d3.css.map",
-    "main.599aa499.js.map": "/my-ethereum-app/static/js/main.599aa499.js.map"
+    "main.f11cd8e2.css.map": "/my-ethereum-app/static/css/main.f11cd8e2.css.map",
+    "main.be1e74e1.js.map": "/my-ethereum-app/static/js/main.be1e74e1.js.map"
   },
   "entrypoints": [
-    "static/css/main.135177d3.css",
-    "static/js/main.599aa499.js"
+    "static/css/main.f11cd8e2.css",
+    "static/js/main.be1e74e1.js"
   ]
 }
