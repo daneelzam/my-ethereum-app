@@ -18,11 +18,11 @@ function App() {
   const [txList, setTxList] = useState<EthTx[]>()
   const [txListIsLoading, setTxListIsLoading] = useState(false);
 
-
   const [txHash, setTxHash] = useState<string| undefined>();
   const [txURL, setTxURl] = useState<string| undefined>();
   const [blockNumber, setBlockNumber] = useState<string| undefined>();
   const [txIsSending, setTxIsSending] = useState(false);
+  const [sendingStatus, setSendingStatus] = useState('Create transaction object');
 
   const [error, setError] = useState<string| undefined>();
   
@@ -84,6 +84,11 @@ function App() {
 
   const sendTransactionHandler = async (event: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
+    
+    setTxHash('');
+    setTxIsSending(false);
+    setBlockNumber('');
+    setSendingStatus('Create transaction object');
 
     if (!addressFrom || !addressTo || !privateKey || !amount){
       setError('Please fill in all fields')
@@ -103,7 +108,7 @@ function App() {
     setTxIsSending(true);
 
     try {
-      const result = await sendTransaction({ addressTo, amount, privateKey });
+      const result = await sendTransaction({ addressTo, amount, privateKey, setSendingStatus });
       setTxHash(result.hash);
       setTxURl(`https://goerli.etherscan.io/tx/${result.hash}`)
       setBlockNumber(result.blockNumber)
@@ -166,11 +171,12 @@ function App() {
               ? <div className='loading'>Loading</div>
               : 'Send'}
           </button>
+          {!blockNumber && txIsSending && <div>{sendingStatus}</div>}
+          {blockNumber && !txIsSending && <div>SUCCESS, your transaction in the chain now, in block number {blockNumber}</div>}
           <div className='result'>
             <div>Transaction hash:</div>
             <div className='hash'>{txHash ? <a href={txURL} target='_blank' rel="noreferrer">{txHash}</a> : '-'}</div>
           </div>
-          {blockNumber && <div>SUCCESS, your transaction in the chain now, in block number {blockNumber}</div>}
           {error && <div className='error'>{error}</div>}
         </form>
         <div>

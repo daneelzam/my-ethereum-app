@@ -1,7 +1,9 @@
 import Web3 from 'web3';
 import type { EthTx } from './App.model';
+import type { Dispatch, SetStateAction } from 'react'
 
-const web3 = new Web3(new Web3.providers.HttpProvider(`https://goerli.infura.io/v3/${process.env.REACT_APP_INFURA_PROJECT_ID}`));
+const INFURA_URL = `https://goerli.infura.io/v3/${process.env.REACT_APP_INFURA_PROJECT_ID}`;
+const web3 = new Web3(INFURA_URL);
 const ETHERSCAN_API_KEY = process.env.REACT_APP_ETHERSCAN_API_KEY;
 
 export const getBalance = async ({ addressFrom }: {addressFrom: string}): Promise<string> => {
@@ -39,7 +41,7 @@ export const getFee = async ({ amount, addressTo }: { amount: string, addressTo:
     }
 };
 
-export const sendTransaction = async ({ privateKey, addressTo, amount }: { privateKey: string, addressTo: string, amount: string }): Promise<{
+export const sendTransaction = async ({ privateKey, addressTo, amount, setSendingStatus }: { privateKey: string, addressTo: string, amount: string, setSendingStatus: Dispatch<SetStateAction<string>> }): Promise<{
     hash: string;
     blockNumber: string;
 }> => {
@@ -49,30 +51,37 @@ export const sendTransaction = async ({ privateKey, addressTo, amount }: { priva
     };
 
     transactionObject.gas = await web3.eth.estimateGas(transactionObject);
-    
+        
     const { rawTransaction: signedTransaction } = await web3.eth.accounts.signTransaction(transactionObject, privateKey);
 
      if (!signedTransaction) {
         throw Error('Some problem')
      }
 
-    let hash = '';
+    setSendingStatus('Transaction signed')
 
     const receipt = await web3.eth
     .sendSignedTransaction(signedTransaction)
-    .on("transactionHash", (txhash) => {
-        hash = txhash;
+    .once("sending",  () => {
+        setSendingStatus('The transaction is broadcast to the blockchain')
+    })
+    .once("sent", () => {
+        setSendingStatus('Expecting a hash')
+    })
+    .once("transactionHash", (transactionHash) => {
+        setSendingStatus(`Transaction verified, hash is: ${transactionHash}`)
     });
     
     return {
-        hash, 
+        hash: receipt.transactionHash, 
         blockNumber: receipt.blockNumber.toString()
     }
 };
 
 export const getTransactionList = async ({addressFrom}:{addressFrom: string}): Promise<EthTx[]> => {
-    const responce = await fetch(`https://api-goerli.etherscan.io/api?module=account&action=txlist&address=${addressFrom}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${ETHERSCAN_API_KEY}`)
-    const { result }: {result: EthTx[]} = await responce.json();
+    const url = `https://api-goerli.etherscan.io/api?module=account&action=txlist&address=${addressFrom}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${ETHERSCAN_API_KEY}`
+    const response = await fetch(url)
+    const { result }: {result: EthTx[]} = await response.json();
     return result.map(tx => (
         {
             ...tx,
