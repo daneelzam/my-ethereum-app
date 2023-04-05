@@ -146,7 +146,7 @@ function App() {
             </button>
           <div className='result'>
             <div>Balance:</div>
-            <div>{balance ? `${balance} Goerli Eth` : '-'}</div>
+            <div>{balance ? `${balance} GETH` : '-'}</div>
           </div>
         </form>
         <div className='line'/>
@@ -159,12 +159,12 @@ function App() {
           <div className='form-item'>
             <label htmlFor="amount">Amount</label>
             <input type="text" name="amount" value={amount} onChange={(event: React.FormEvent<HTMLInputElement>)=>setAmount(event.currentTarget.value)}/>
-            <span className='ticker'>Goerli Eth</span>
+            <span className='ticker'>GETH</span>
           </div>
           <div className='form-item'>
             <label htmlFor="fee">Fee</label>
             <input type="text" name="fee" value={fee || '-'} disabled/>
-            <span className='ticker'>Goerli Eth</span>
+            <span className='ticker'>GETH</span>
           </div>
           <button className='button' onClick={sendTransactionHandler}>
             {txIsSending
@@ -211,7 +211,7 @@ function App() {
                   </div>
                   <div className='tx-item'>
                     <div>Amount:</div>
-                    <div>{tx.value} Goerli Eth</div>
+                    <div>{tx.value} GETH</div>
                   </div>
                 </div>
               ))}

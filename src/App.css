@@ -168,6 +168,32 @@ footer {
   margin: 10px
 }
 
+@media (max-width: 516px ) {
+  .App-header {
+    width: 70vw;
+  }
+  
+  .App-body {
+    width: 70vw;
+  }
+  
+  .ticker {
+    right: -50px;
+    margin-top: 30px;
+  }
+
+  .form-item {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .form input {
+    margin-top: 10px;
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
 @keyframes dots {
   0%,
   20% {
