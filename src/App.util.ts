@@ -79,7 +79,7 @@ export const sendTransaction = async ({ privateKey, addressTo, amount, setSendin
 };
 
 export const getTransactionList = async ({addressFrom}:{addressFrom: string}): Promise<EthTx[]> => {
-    const url = `https://api-goerli.etherscan.io/api?module=account&action=txlist&address=${addressFrom}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${ETHERSCAN_API_KEY}`
+    const url = `https://api-goerli.etherscan.io/api?module=account&action=txlist&address=${addressFrom}&startblock=0&endblock=99999999&page=1&offset=10&sort=desc&apikey=${ETHERSCAN_API_KEY}`
     const response = await fetch(url)
     const { result }: {result: EthTx[]} = await response.json();
     return result.map(tx => (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.png';
+// import logo from './logo.png';
 import githubLogo from './github.logo.svg';
 import './App.css';
 import { getBalance, getTransactionList, sendTransaction, getFee } from './App.util';
@@ -122,7 +122,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+        {/*<img src={logo} className="App-logo" alt="logo" />*/}
         <h1>
           Simple app for creating and submitting send transaction in Etherium testnet (Goerli)
         </h1>
